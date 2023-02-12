@@ -1,0 +1,6 @@
+package com.example.social_final
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity: FlutterActivity() {
+}
