@@ -7,10 +7,12 @@ BuildTextFormField({
   required IconData pIcon,
   IconData? sIcon,
   void Function()? onPressedOnSIcon,
+  void Function()? onPressedOnPIcon,
   void Function(String value)? onChanged,
   required String? Function(String? value)? validator,
   bool isPassword = false,
   TextInputType? type ,
+  Color? colorOfSIcon,
 }) {
   return TextFormField(
     controller: controller,
@@ -20,12 +22,16 @@ BuildTextFormField({
         borderRadius: BorderRadius.circular(radius),
       ),
       label: Text(label),
-      prefixIcon: Icon(
-        pIcon,
+      prefixIcon: InkWell(
+        onTap: onPressedOnPIcon,
+        child: Icon(
+          pIcon,
+        ),
       ),
       suffixIcon: IconButton(
         icon: Icon(
           sIcon,
+          color: colorOfSIcon,
         ),
         onPressed: onPressedOnSIcon,
       ),

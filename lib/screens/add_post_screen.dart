@@ -1,6 +1,7 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:video_player/video_player.dart';
 
 import '../reusable_components/reusable_components.dart';
 import '../social_cubit/social_cubit.dart';
@@ -16,8 +17,8 @@ class AddPostScreen extends StatelessWidget {
         if (state is CreateNewPostSuccessfullyState) {
           SocialCubit.get(context).GetAllPosts();
           SocialCubit.get(context).RemovePostImage();
-          textController.text = '' ;
-          SocialCubit.get(context).currentIndex=0;
+          textController.text = '';
+          SocialCubit.get(context).currentIndex = 0;
         }
         print(state);
       },
@@ -95,6 +96,14 @@ class AddPostScreen extends StatelessWidget {
                           ],
                         ),
                       ),
+                    if(SocialCubit.get(context).controller!= null)
+                    if (SocialCubit.get(context).controller!.value.isInitialized)
+                      Center(
+                          child: Container(
+                            height: 200,
+                              width: double.infinity,
+                              child: VideoPlayer(
+                                  SocialCubit.get(context).controller!))),
                     SizedBox(
                       height: 25,
                     ),
@@ -105,30 +114,45 @@ class AddPostScreen extends StatelessWidget {
                       label: 'Add photo',
                     ),
                     SizedBox(
+                      height: 15,
+                    ),
+                    BuildMaterialButton(
+                      onPressed: () {
+                        SocialCubit.get(context).GetPostVideo();
+                      },
+                      label: 'Add video',
+                    ),
+                    SizedBox(
                       height: 15.0,
                     ),
                     ConditionalBuilder(
-                      condition: state is !UploadPostImageLoadingState ,
-                      builder: (context)=> BuildMaterialButton(
+                      condition: state is! UploadPostImageLoadingState,
+                      builder: (context) => BuildMaterialButton(
                         onPressed: () {
-                          if (textController.text.isNotEmpty ||
-                              SocialCubit.get(context).postImage != null) {
-                            if (SocialCubit.get(context).postImage != null) {
-                              SocialCubit.get(context).UploadPostImage(
-                                date: DateTime.now().toString(),
-                                text: textController.text,
-                              );
-                            } else {
-                              SocialCubit.get(context).CreateNewPost(
-                                date: DateTime.now().toString(),
-                                text: textController.text,
-                              );
-                            }
-                          }
+                          // if (textController.text.isNotEmpty ||
+                          //     SocialCubit.get(context).postImage != null) {
+                          //   if (SocialCubit.get(context).postImage != null) {
+                          //     SocialCubit.get(context).UploadPostImage(
+                          //       date: DateTime.now().toString(),
+                          //       text: textController.text,
+                          //     );
+                          //   } else {
+                          //     SocialCubit.get(context).CreateNewPost(
+                          //       date: DateTime.now().toString(),
+                          //       text: textController.text,
+                          //     );
+                          //   }
+                          // }
+
+                          SocialCubit.get(context).UploadPostVideo(
+                            date: DateTime.now().toString(),
+                            text: textController.text,
+                          );
                         },
                         label: 'Post',
                       ),
-                      fallback: (context)=> Center(child: CircularProgressIndicator()),
+                      fallback: (context) =>
+                          Center(child: CircularProgressIndicator()),
                     ),
                   ],
                 ),

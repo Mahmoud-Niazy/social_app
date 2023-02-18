@@ -75,9 +75,8 @@ class ChatDetailsScreen extends StatelessWidget {
                     fallback: (context) =>
                         Center(child: CircularProgressIndicator()),
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
+                 if(SocialCubit.get(context).messages.length==0)
+                   Spacer(),
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 15.0,

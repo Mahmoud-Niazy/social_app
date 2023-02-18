@@ -63,4 +63,40 @@ class GetAllMessagesSuccessfullyState extends SocialStates{}
 class GetAllMessagesErrorState extends SocialStates{}
 
 
+class GetPeopleWhoLikeLoadingState extends SocialStates{}
+class GetPeopleWhoLikeSuccessfullyState extends SocialStates{}
+class GetPeopleWhoLikeErrorState extends SocialStates{}
+
+class AddCommentLoadingState extends SocialStates {}
+class AddCommentSuccessfullyState extends SocialStates {}
+class AddCommentErrorState extends SocialStates {}
+
+class GetCommentLoadingState extends SocialStates {}
+class GetCommentSuccessfullyState extends SocialStates {}
+class GetCommentErrorState extends SocialStates {}
+
+class GetCommentImageSuccessfullyState extends SocialStates{}
+class GetCommentImageErrorState extends SocialStates{}
+
+class UploadCommentImageLoadingState extends SocialStates{}
+class UploadCommentImageSuccessfullyState extends SocialStates{}
+class UploadCommentImageErrorState extends SocialStates{}
+
+class RemoveCommentImageState extends SocialStates{}
+
+class DeletePostLoadingState extends SocialStates{}
+class DeletePostSuccessfullyState extends SocialStates{}
+class DeletePostErrorState extends SocialStates{}
+
+
+class GetPostVideoSuccessfullyState extends SocialStates{}
+class GetPostVideoErrorState extends SocialStates{}
+
+
+class UploadPostVideoLoadingState extends SocialStates{}
+class UploadPostVideoSuccessfullyState extends SocialStates{}
+class UploadPostVideoErrorState extends SocialStates{}
+
+
+
 

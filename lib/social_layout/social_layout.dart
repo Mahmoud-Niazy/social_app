@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_final/social_cubit/social_cubit.dart';
 
+import '../constants.dart';
 import '../social_cubit/social_states.dart';
 
 class SocialLayout extends StatelessWidget {
@@ -16,6 +17,7 @@ class SocialLayout extends StatelessWidget {
       builder: (context,state){
         var cubit = SocialCubit.get(context);
         return Scaffold(
+          key: scaffoldKey,
           appBar: AppBar(
             title: Text(
               'Social',
@@ -40,6 +42,9 @@ class SocialLayout extends StatelessWidget {
             ],
             currentIndex: cubit.currentIndex,
             onTap: (index){
+              if(index ==1){
+                SocialCubit.get(context).GetAllUsers();
+              }
               cubit.BottomNavigation(index);
             },
           ),

@@ -23,6 +23,7 @@ class LoginScreen extends StatelessWidget {
       child: BlocConsumer<LoginCubit, LoginStates>(
         listener: (context, state) {
           if (state is UserLoginSuccessfullyState) {
+
             uId = CasheHelper.GetData(key: 'uId');
             SocialCubit.get(context).GetUserData();
             SocialCubit.get(context).GetAllPosts();
