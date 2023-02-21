@@ -26,8 +26,8 @@ class LoginScreen extends StatelessWidget {
 
             uId = CasheHelper.GetData(key: 'uId');
             SocialCubit.get(context).GetUserData();
-            SocialCubit.get(context).GetAllPosts();
-            SocialCubit.get(context).GetAllUsers();
+            // SocialCubit.get(context).GetAllPosts();
+            // SocialCubit.get(context).GetAllUsers();
             NavigateAndRemove(
               context: context,
               route: SocialLayout.route,

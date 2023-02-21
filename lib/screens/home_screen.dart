@@ -3,7 +3,6 @@ import 'package:conditional_builder_null_safety/conditional_builder_null_safety.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_final/screens/comments_screen.dart';
-
 import '../constants.dart';
 import '../data_models/new_post_data_model.dart';
 import '../data_models/user_data_model.dart';
@@ -14,90 +13,85 @@ import '../social_cubit/social_states.dart';
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<SocialCubit, SocialStates>(
-      listener: (context, state) {
-        if (state is GetUserDataSuccessfullyState) {
-          // SocialCubit.get(context).GetAllUsers() ;
-        }
-      },
-      builder: (context, state) {
-        return ConditionalBuilder(
-          condition: SocialCubit
-              .get(context)
-              .posts
-              .length > 0,
-          builder: (context) {
-            return SingleChildScrollView(
-              physics: BouncingScrollPhysics(),
-              child: Column(
-                children: [
-                  Stack(
-                    alignment: Alignment.bottomRight,
-                    children: [
-                      Card(
-                        child: Image(
-                          image: NetworkImage(
-                            'https://img.freepik.com/free-photo/excited-happy-young-pretty-woman_171337-2005.jpg?size=626&ext=jpg&ga=GA1.2.190088039.1657057581',
+    return Builder(builder: (context){
+      SocialCubit.get(context).GetAllPosts();
+      return BlocConsumer<SocialCubit, SocialStates>(
+        listener: (context, state) {
+          if (state is GetUserDataSuccessfullyState) {
+            // SocialCubit.get(context).GetAllUsers() ;
+
+          }
+        },
+        builder: (context, state) {
+          return ConditionalBuilder(
+            condition: SocialCubit.get(context).posts.length > 0,
+            builder: (context) {
+              return SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                child: Column(
+                  children: [
+                    Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        Card(
+                          child: Image(
+                            image: NetworkImage(
+                              'https://img.freepik.com/free-photo/excited-happy-young-pretty-woman_171337-2005.jpg?size=626&ext=jpg&ga=GA1.2.190088039.1657057581',
+                            ),
+                          ),
+                          elevation: 15,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Text(
+                            'Communicate with your friends',
+                            style: TextStyle(
+                              fontSize: 15.0,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
-                        elevation: 15,
+                      ],
+                    ),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    ListView.separated(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) => BuildPostItem(
+                          context, SocialCubit.get(context).posts[index], index),
+                      separatorBuilder: (context, index) => SizedBox(
+                        height: 15.0,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Text(
-                          'Communicate with your friends',
-                          style: TextStyle(
-                            fontSize: 15.0,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  ListView.separated(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) =>
-                        BuildPostItem(
-                            context, SocialCubit
-                            .get(context)
-                            .posts[index], index),
-                    separatorBuilder: (context, index) =>
-                        SizedBox(
-                          height: 15.0,
-                        ),
-                    itemCount: SocialCubit
-                        .get(context)
-                        .posts
-                        .length,
-                  ),
-                ],
-              ),
-            );
-          },
-          fallback: (context) =>
-              Center(
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.hourglass_empty,
-                        size: 150,
-                      ),
-                      Text(
-                        'No posts',
-                        style: TextStyle(
-                          fontSize: 50,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  )),
-        );
-      },
-    );
+                      itemCount: SocialCubit.get(context).posts.length,
+                    ),
+                  ],
+                ),
+              );
+            },
+            fallback: (context) => Center(child: CircularProgressIndicator()),
+            //     Center(
+            //     child: Column(
+            //   children: [
+            //     Icon(
+            //       Icons.hourglass_empty,
+            //       size: 150,
+            //     ),
+            //     Text(
+            //       'No posts',
+            //       style: TextStyle(
+            //         fontSize: 50,
+            //         fontWeight: FontWeight.bold,
+            //       ),
+            //     ),
+            //   ],
+            // )),
+          );
+        },
+      );
+    },);
+
   }
 
   Widget BuildPostItem(context, PostModel post, index) {
@@ -123,11 +117,24 @@ class HomeScreen extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    CircleAvatar(
-                      backgroundImage: NetworkImage(
-                        post.image!,
+                    //////////////////////////////////////////////////////////////////////
+
+                    InkWell(
+                      onTap: () {
+                        // NavigateWithName(
+                        //     context: context,
+                        //     route: AnotherUserScreen.route,
+                        //     data: {
+                        //       'id' : post.userId,
+                        //     }
+                        // );
+                      },
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage(
+                          post.image!,
+                        ),
+                        radius: 25.0,
                       ),
-                      radius: 25.0,
                     ),
                     SizedBox(
                       width: 15.0,
@@ -154,24 +161,22 @@ class HomeScreen extends StatelessWidget {
                         ),
                         Text(
                           post.date!,
-                          style: Theme
-                              .of(context)
-                              .textTheme
-                              .caption,
+                          style: Theme.of(context).textTheme.caption,
                         ),
                       ],
                     ),
                     Spacer(),
-                    if(post.userId==SocialCubit.get(context).user!.uId)
-                    PopupMenuButton(itemBuilder: (context) =>
-                    [
-                      PopupMenuItem(
-                        child: Text('Delete'),
-                        onTap: (){
-                          SocialCubit.get(context).DeletePost(postId: post.postId!);
-                        },
-                      ),
-                    ]),
+                    if (post.userId == SocialCubit.get(context).user!.uId)
+                      PopupMenuButton(
+                          itemBuilder: (context) => [
+                                PopupMenuItem(
+                                  child: Text('Delete'),
+                                  onTap: () {
+                                    SocialCubit.get(context)
+                                        .DeletePost(postId: post.postId!);
+                                  },
+                                ),
+                              ]),
                     // IconButton(
                     //   onPressed: () {},
                     //   icon: Icon(
@@ -241,44 +246,40 @@ class HomeScreen extends StatelessWidget {
                                   //   ),
                                   // ),
                                   body:
-                                  // ListView.separated(
-                                  //   itemBuilder: (context, index) {
-                                  //     return PeopleWhoLikeModel(
-                                  //         SocialCubit.get(context).peopleWhoLike[index]);
-                                  //   },
-                                  //   separatorBuilder: (context, index) => SizedBox(
-                                  //     height: 0,
-                                  //   ),
-                                  //   itemCount: SocialCubit.get(context).peopleWhoLike.length,
-                                  // ),
+                                      // ListView.separated(
+                                      //   itemBuilder: (context, index) {
+                                      //     return PeopleWhoLikeModel(
+                                      //         SocialCubit.get(context).peopleWhoLike[index]);
+                                      //   },
+                                      //   separatorBuilder: (context, index) => SizedBox(
+                                      //     height: 0,
+                                      //   ),
+                                      //   itemCount: SocialCubit.get(context).peopleWhoLike.length,
+                                      // ),
 
-                                  ConditionalBuilder(
+                                      ConditionalBuilder(
                                     condition:
-                                    state is! GetPeopleWhoLikeLoadingState,
+                                        state is! GetPeopleWhoLikeLoadingState,
                                     // SocialCubit
                                     //     .get(context)
                                     //     .peopleWhoLike
                                     //     .length > 0,
-                                    builder: (context) =>
-                                        ListView.separated(
-                                          itemBuilder: (context, index) {
-                                            return PeopleWhoLikeModel(
-                                                SocialCubit
-                                                    .get(context)
-                                                    .peopleWhoLike[index]);
-                                          },
-                                          separatorBuilder: (context, index) =>
-                                              SizedBox(
-                                                height: 0,
-                                              ),
-                                          itemCount: SocialCubit
-                                              .get(context)
-                                              .peopleWhoLike
-                                              .length,
-                                        ),
-                                    fallback: (context) =>
-                                        Center(
-                                            child: CircularProgressIndicator()),
+                                    builder: (context) => ListView.separated(
+                                      itemBuilder: (context, index) {
+                                        return PeopleWhoLikeModel(
+                                            SocialCubit.get(context)
+                                                .peopleWhoLike[index]);
+                                      },
+                                      separatorBuilder: (context, index) =>
+                                          SizedBox(
+                                        height: 0,
+                                      ),
+                                      itemCount: SocialCubit.get(context)
+                                          .peopleWhoLike
+                                          .length,
+                                    ),
+                                    fallback: (context) => Center(
+                                        child: CircularProgressIndicator()),
                                   ),
                                 ),
                               );
@@ -332,10 +333,9 @@ class HomeScreen extends StatelessWidget {
                           SizedBox(
                             width: 5.0,
                           ),
-                          Text(
-                              '${post.numOfComments}'
-                            // "${SocialCubit.get(context).GetNumOfcomments(post.postId)}",
-                          ),
+                          Text('${post.numOfComments}'
+                              // "${SocialCubit.get(context).GetNumOfcomments(post.postId)}",
+                              ),
                         ],
                       ),
                     )
@@ -354,10 +354,7 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       backgroundImage: NetworkImage(
-                        SocialCubit
-                            .get(context)
-                            .user!
-                            .image,
+                        SocialCubit.get(context).user!.image,
                       ),
                       radius: 20.0,
                     ),
@@ -381,10 +378,7 @@ class HomeScreen extends StatelessWidget {
                       },
                       child: Text(
                         'Write a comment',
-                        style: Theme
-                            .of(context)
-                            .textTheme
-                            .caption,
+                        style: Theme.of(context).textTheme.caption,
                       ),
                     ),
                     Spacer(),
@@ -410,16 +404,10 @@ class HomeScreen extends StatelessWidget {
                       ),
                       onTap: () {
                         if (post.userWhoLike
-                            .contains(SocialCubit
-                            .get(context)
-                            .user!
-                            .uId) ==
+                                .contains(SocialCubit.get(context).user!.uId) ==
                             false) {
                           post.userWhoLike
-                              .add(SocialCubit
-                              .get(context)
-                              .user!
-                              .uId);
+                              .add(SocialCubit.get(context).user!.uId);
                           PostModel newPost = PostModel(
                             image: post.image,
                             name: post.name,
@@ -431,7 +419,6 @@ class HomeScreen extends StatelessWidget {
                             numOfComments: post.numOfComments,
                             userWhoLike: post.userWhoLike,
                             userId: SocialCubit.get(context).user!.uId,
-
                           );
                           FirebaseFirestore.instance
                               .collection('posts')
@@ -445,10 +432,7 @@ class HomeScreen extends StatelessWidget {
                           });
                         } else {
                           post.userWhoLike
-                              .remove(SocialCubit
-                              .get(context)
-                              .user!
-                              .uId);
+                              .remove(SocialCubit.get(context).user!.uId);
                           PostModel newPost = PostModel(
                             image: post.image,
                             name: post.name,
@@ -460,7 +444,6 @@ class HomeScreen extends StatelessWidget {
                             userWhoLike: post.userWhoLike,
                             numOfComments: post.numOfComments,
                             userId: SocialCubit.get(context).user!.uId,
-
                           );
                           FirebaseFirestore.instance
                               .collection('posts')
@@ -528,8 +511,8 @@ PeopleWhoLikeModel(UserModel user) {
             CircleAvatar(
               radius: 30,
               backgroundImage: NetworkImage(user.image
-                // 'https://img.freepik.com/premium-photo/tiny-cute-adorable-animal_727939-188.jpg?size=338&ext=jpg&ga=GA1.2.190088039.1657057581'),
-              ),
+                  // 'https://img.freepik.com/premium-photo/tiny-cute-adorable-animal_727939-188.jpg?size=338&ext=jpg&ga=GA1.2.190088039.1657057581'),
+                  ),
             ),
             SizedBox(
               width: 20,
@@ -554,4 +537,3 @@ PeopleWhoLikeModel(UserModel user) {
     ),
   );
 }
-

@@ -181,7 +181,6 @@ class SocialCubit extends Cubit<SocialStates> {
       text: text,
       userId: user!.uId,
       postVideo: postVideo,
-
     );
     FirebaseFirestore.instance
         .collection('posts')
@@ -200,7 +199,6 @@ class SocialCubit extends Cubit<SocialStates> {
         postVideo: postVideo,
       );
       FirebaseFirestore.instance
-
           .collection('posts')
           .doc(value.id)
           .update(newPost.ToMap())
@@ -263,11 +261,12 @@ class SocialCubit extends Cubit<SocialStates> {
     posts = [];
     // likes = [] ;
     emit(GetAllPostsLoadingState());
-    FirebaseFirestore.instance
-        .collection('posts')
-        .orderBy('date')
-        .get()
-        .then((value) {
+    FirebaseFirestore.instance.collection('posts').orderBy('date').snapshots()
+
+        // .get()
+        .listen((value) {
+      posts = [];
+
       // GetAllLikes();
       value.docs.forEach((element) {
         posts.add(PostModel.fromJson(element.data()));
@@ -278,10 +277,11 @@ class SocialCubit extends Cubit<SocialStates> {
 
       emit(GetAllPostsSuccessfullyState());
       // print(likes);
-    }).catchError((error) {
-      print(error);
-      emit(GetAllPostsErrorState());
     });
+    //     .catchError((error) {
+    //   print(error);
+    //   emit(GetAllPostsErrorState());
+    // });
   }
 
   // GetAllLikes(){
@@ -322,17 +322,20 @@ class SocialCubit extends Cubit<SocialStates> {
   GetAllUsers() {
     users = [];
     emit(GetAllUsersLoadingState());
-    FirebaseFirestore.instance.collection('users').get().then((value) {
+    FirebaseFirestore.instance.collection('users')
+    .snapshots().listen((value) {
+      users = [];
       value.docs.forEach((element) {
         GetUserData();
         if (element.reference.id != user!.uId)
           users.add(UserModel.fromJson(element.data()));
       });
       emit(GetAllUsersSuccessfullyState());
-    }).catchError((error) {
-      print(error);
-      emit(GetAllUsersErrorState());
     });
+    //     .catchError((error) {
+    //   print(error);
+    //   emit(GetAllUsersErrorState());
+    // });
   }
 
   SendMessage({
@@ -541,31 +544,34 @@ class SocialCubit extends Cubit<SocialStates> {
   }
 
   GetNumOfcomments(postId) async {
-     await FirebaseFirestore.instance.collection('posts')
-   .doc(postId).collection('comments')
-      .get().then((value)async {
-       return await value.docs.length.toInt();
-     });
-
-
+    await FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .collection('comments')
+        .get()
+        .then((value) async {
+      return await value.docs.length.toInt();
+    });
   }
 
   DeletePost({
     required String postId,
-}){
+  }) {
     emit(DeletePostLoadingState());
-    FirebaseFirestore.instance.collection('posts')
+    FirebaseFirestore.instance
+        .collection('posts')
         .doc(postId)
-        .delete().then((value){
-          emit(DeletePostSuccessfullyState());
-          GetAllPosts();
-    })
-        .catchError((error){
-          emit(DeletePostErrorState());
+        .delete()
+        .then((value) {
+      emit(DeletePostSuccessfullyState());
+      GetAllPosts();
+    }).catchError((error) {
+      emit(DeletePostErrorState());
     });
   }
 
-  File? postVideo ;
+  File? postVideo;
+
   GetPostVideo() async {
     final pickedFile = await picker.pickVideo(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -577,7 +583,8 @@ class SocialCubit extends Cubit<SocialStates> {
     }
   }
 
-  VideoPlayerController? controller ;
+  VideoPlayerController? controller;
+
   UploadPostVideo({
     required String date,
     required String text,
@@ -588,28 +595,58 @@ class SocialCubit extends Cubit<SocialStates> {
         .child('videos/${Uri.file(postVideo!.path).pathSegments.last}')
         .putFile(postVideo!)
         .then((value) => {
-      value.ref.getDownloadURL().then((value) {
-        controller = VideoPlayerController.network(
-          value,
-        )
-          ..initialize().then((_) {
-            // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-
-          });
-        // emit(UploadPostVideoSuccessfullyState());
-        CreateNewPost(
-          date: date,
-          text: text,
-          postVideo: value,
-        );
-        emit(UploadPostVideoSuccessfullyState());
-
-      }).catchError((error) {
-        emit(UploadPostVideoErrorState());
-      })
-    })
+              value.ref.getDownloadURL().then((value) async {
+                // controller = VideoPlayerController.network(
+                //   value,
+                // );
+                //   await controller!.initialize().then((_) {
+                //     // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+                //
+                //   });
+                // emit(UploadPostVideoSuccessfullyState());
+                CreateNewPost(
+                  date: date,
+                  text: text,
+                  postVideo: value,
+                );
+                emit(UploadPostVideoSuccessfullyState());
+              }).catchError((error) {
+                emit(UploadPostVideoErrorState());
+              })
+            })
         .catchError((error) {
       emit(UploadPostVideoErrorState());
     });
   }
+
+  List<UserModel> searchResult=[];
+  Search(name){
+    searchResult =  users.where((element){
+      return element.name.contains(name);
+    }
+
+    ).toList();
+    // FirebaseFirestore.instance
+    //     .collection('users')
+    //     .get()
+    //     .then((value) {
+    //       value.docs.forEach(( element) {
+    //         if(element['name']==name){
+    //           searchResult.add(UserModel.fromJson(element.data()));
+    //           emit(SearchSuccessfully());
+    //         }
+    //       });
+    // });
+    emit(SearchSuccessfully());
+  }
+
+  // List<PostModel> userPosts =[];
+  // GetUserPosts(context){
+  //   emit(GetUserPostsLoadingState());
+  //    userPosts =
+  //   SocialCubit.get(context).posts.where((element) {
+  //     return element.userId == user!.uId;
+  //   }).toList();
+  //    emit(GetUserPostsSuccessfullyState());
+  // }
 }

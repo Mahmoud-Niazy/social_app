@@ -42,7 +42,7 @@ dependencies:
   firebase_storage: any
   intl: ^0.17.0
   video_player: ^2.5.1
-
+  awesome_notifications: any
 
 
 
@@ -73,8 +73,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/11-2-networking-png-images.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

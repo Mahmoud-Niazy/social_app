@@ -9,7 +9,7 @@ BuildTextFormField({
   void Function()? onPressedOnSIcon,
   void Function()? onPressedOnPIcon,
   void Function(String value)? onChanged,
-  required String? Function(String? value)? validator,
+   String? Function(String? value)? validator,
   bool isPassword = false,
   TextInputType? type ,
   Color? colorOfSIcon,

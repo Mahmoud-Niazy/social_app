@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,7 +9,7 @@ import '../social_cubit/social_cubit.dart';
 import '../social_cubit/social_states.dart';
 
 class ChatDetailsScreen extends StatelessWidget {
-  var text_controller = TextEditingController();
+  var textController = TextEditingController();
   late UserModel user;
   ChatDetailsScreen(this.user);
 
@@ -86,7 +87,7 @@ class ChatDetailsScreen extends StatelessWidget {
                       children: [
                         Expanded(
                           child: TextFormField(
-                            controller: text_controller,
+                            controller: textController,
                             decoration: InputDecoration(
                               label: Text('Write message here'),
                               border: OutlineInputBorder(),
@@ -97,10 +98,21 @@ class ChatDetailsScreen extends StatelessWidget {
                           onPressed: () {
                             SocialCubit.get(context).SendMessage(
                               recieverId: user.uId,
-                              text: text_controller.text,
+                              text: textController.text,
                               date: DateTime.now().toString(),
                             );
-                            text_controller.text = '';
+                            if(SocialCubit.get(context).user!.uId==user.uId ){
+                              AwesomeNotifications().createNotification(
+                                  content: NotificationContent(
+                                  id: 1,
+                                  channelKey: 'basic_channel',
+                                  title: SocialCubit.get(context).user!.name,
+                                  body: textController.text,
+                                  ),
+
+                              );
+                            }
+                            textController.text = '';
                           },
                           icon: Icon(
                             Icons.send,

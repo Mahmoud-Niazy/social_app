@@ -97,6 +97,15 @@ class UploadPostVideoLoadingState extends SocialStates{}
 class UploadPostVideoSuccessfullyState extends SocialStates{}
 class UploadPostVideoErrorState extends SocialStates{}
 
+class SearchLoading extends SocialStates{}
+class SearchSuccessfully extends SocialStates{}
+class SearchError extends SocialStates{}
+
+class GetUserPostsLoadingState extends SocialStates{}
+class GetUserPostsSuccessfullyState extends SocialStates{}
+
+
+
 
 
 

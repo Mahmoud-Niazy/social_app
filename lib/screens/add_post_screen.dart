@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,7 +16,7 @@ class AddPostScreen extends StatelessWidget {
     return BlocConsumer<SocialCubit, SocialStates>(
       listener: (context, state) {
         if (state is CreateNewPostSuccessfullyState) {
-          SocialCubit.get(context).GetAllPosts();
+          // SocialCubit.get(context).GetAllPosts();
           SocialCubit.get(context).RemovePostImage();
           textController.text = '';
           SocialCubit.get(context).currentIndex = 0;
@@ -23,6 +24,7 @@ class AddPostScreen extends StatelessWidget {
         print(state);
       },
       builder: (context, state) {
+
         return ConditionalBuilder(
           condition: SocialCubit.get(context).user != null,
           builder: (context) {
@@ -97,7 +99,6 @@ class AddPostScreen extends StatelessWidget {
                         ),
                       ),
                     if(SocialCubit.get(context).controller!= null)
-                    if (SocialCubit.get(context).controller!.value.isInitialized)
                       Center(
                           child: Container(
                             height: 200,
@@ -113,15 +114,15 @@ class AddPostScreen extends StatelessWidget {
                       },
                       label: 'Add photo',
                     ),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    BuildMaterialButton(
-                      onPressed: () {
-                        SocialCubit.get(context).GetPostVideo();
-                      },
-                      label: 'Add video',
-                    ),
+                    // SizedBox(
+                    //   height: 15,
+                    // ),
+                    // BuildMaterialButton(
+                    //   onPressed: () {
+                    //     SocialCubit.get(context).GetPostVideo();
+                    //   },
+                    //   label: 'Add video',
+                    // ),
                     SizedBox(
                       height: 15.0,
                     ),
@@ -129,25 +130,44 @@ class AddPostScreen extends StatelessWidget {
                       condition: state is! UploadPostImageLoadingState,
                       builder: (context) => BuildMaterialButton(
                         onPressed: () {
-                          // if (textController.text.isNotEmpty ||
-                          //     SocialCubit.get(context).postImage != null) {
-                          //   if (SocialCubit.get(context).postImage != null) {
-                          //     SocialCubit.get(context).UploadPostImage(
-                          //       date: DateTime.now().toString(),
-                          //       text: textController.text,
-                          //     );
-                          //   } else {
-                          //     SocialCubit.get(context).CreateNewPost(
-                          //       date: DateTime.now().toString(),
-                          //       text: textController.text,
-                          //     );
-                          //   }
-                          // }
+                          if (textController.text.isNotEmpty ||
+                              SocialCubit.get(context).postImage != null) {
+                            if (SocialCubit.get(context).postImage != null) {
+                              SocialCubit.get(context).UploadPostImage(
+                                date: DateTime.now().toString(),
+                                text: textController.text,
+                              );
+                              AwesomeNotifications().createNotification(
+                                  content: NotificationContent(
+                                    id: 1,
+                                    channelKey: 'basic_channel',
+                                    title: SocialCubit.get(context).user!.name,
+                                    body: 'new post',
+                                  )
 
-                          SocialCubit.get(context).UploadPostVideo(
-                            date: DateTime.now().toString(),
-                            text: textController.text,
-                          );
+                              );
+                            } else {
+                              SocialCubit.get(context).CreateNewPost(
+                                date: DateTime.now().toString(),
+                                text: textController.text,
+                              );
+                              AwesomeNotifications().createNotification(
+                                  content: NotificationContent(
+                                    id: 1,
+                                    channelKey: 'basic_channel',
+                                    title: SocialCubit.get(context).user!.name,
+                                    body: 'new post',
+                                  ),
+                              );
+                            }
+                          }
+
+                          /////////////////////////////////////////
+
+                          // SocialCubit.get(context).UploadPostVideo(
+                          //   date: DateTime.now().toString(),
+                          //   text: textController.text,
+                          // );
                         },
                         label: 'Post',
                       ),

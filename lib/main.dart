@@ -1,6 +1,8 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_final/screens/another_user_screen.dart';
 import 'package:social_final/screens/comments_screen.dart';
 import 'package:social_final/screens/edit_profile_screen.dart';
 import 'package:social_final/screens/login_screen.dart';
@@ -17,6 +19,20 @@ void main()async{
   await Firebase.initializeApp();
  await  CasheHelper.Init();
   uId  = CasheHelper.GetData(key: 'uId');
+  AwesomeNotifications().initialize(
+    // set the icon to null if you want to use the default app icon
+    'resource://mipmap/ic_launcher',
+    [
+      NotificationChannel(
+          channelGroupKey: 'basic_channel_group',
+          channelKey: 'basic_channel',
+          channelName: 'Basic notifications',
+          channelDescription: 'Notification channel for basic tests',
+          defaultColor: Color(0xFF9D50DD),
+
+          ledColor: Colors.white)
+    ],
+  );
   runApp(MyApp());
 }
 
@@ -67,7 +83,9 @@ class MyApp extends StatelessWidget{
           EditProfileScreen.route : (context)=> EditProfileScreen(),
           // PeopleWhoLikeScreen.route : (context)=> PeopleWhoLikeScreen(),
           CommentsScreen.route : (context)=> CommentsScreen(),
+          AnotherUserScreen.route :(context)=> AnotherUserScreen(),
         },
+        debugShowCheckedModeBanner: false ,
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_final/screens/search_screen.dart';
 import 'package:social_final/social_cubit/social_cubit.dart';
 
 import '../constants.dart';
@@ -10,11 +11,11 @@ class SocialLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<SocialCubit,SocialStates>(
-      listener: (context,state){
+    return BlocConsumer<SocialCubit, SocialStates>(
+      listener: (context, state) {
         print(state);
       },
-      builder: (context,state){
+      builder: (context, state) {
         var cubit = SocialCubit.get(context);
         return Scaffold(
           key: scaffoldKey,
@@ -22,6 +23,19 @@ class SocialLayout extends StatelessWidget {
             title: Text(
               'Social',
             ),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context)=> SearchScreen()),
+                  );
+                },
+                icon: Icon(
+                  Icons.search,
+                ),
+              ),
+            ],
           ),
           bottomNavigationBar: BottomNavigationBar(
             items: [
@@ -41,15 +55,15 @@ class SocialLayout extends StatelessWidget {
                   icon: Icon(Icons.settings_outlined), label: 'Settings'),
             ],
             currentIndex: cubit.currentIndex,
-            onTap: (index){
-              if(index ==1){
+            onTap: (index) {
+              if (index == 1) {
                 SocialCubit.get(context).GetAllUsers();
               }
               cubit.BottomNavigation(index);
             },
           ),
           body: cubit.screens[cubit.currentIndex],
-        ) ;
+        );
       },
     );
   }
