@@ -6,6 +6,7 @@ class UserModel{
   late String image ;
   late String cover ;
   late String bio ;
+  String? fcmToken;
 
   UserModel({
     required this.phone,
@@ -15,6 +16,7 @@ class UserModel{
     required this.cover,
     required this.uId,
     required this.bio,
+    this.fcmToken,
 });
 
   Map<String,dynamic>ToMap (){
@@ -26,6 +28,8 @@ class UserModel{
       'cover' : cover ,
       'uId' : uId ,
       'bio' : bio ,
+      'fcmToken' : fcmToken ,
+
     };
   }
 
@@ -37,5 +41,7 @@ class UserModel{
     cover = json['cover'];
     uId = json['uId'];
     bio = json['bio'];
+    fcmToken = json['fcmToken'];
+
   }
 }

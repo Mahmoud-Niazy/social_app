@@ -1,7 +1,6 @@
 import 'dart:io';
-
-import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,11 +11,11 @@ import 'package:social_final/screens/chat_screen.dart';
 import 'package:social_final/screens/settings_screen.dart';
 import 'package:social_final/social_cubit/social_states.dart';
 import 'package:video_player/video_player.dart';
-
 import '../constants.dart';
 import '../data_models/message_data_model.dart';
 import '../data_models/new_post_data_model.dart';
 import '../data_models/user_data_model.dart';
+import '../dio_helper/dio.dart';
 import '../screens/home_screen.dart';
 
 class SocialCubit extends Cubit<SocialStates> {
@@ -44,6 +43,20 @@ class SocialCubit extends Cubit<SocialStates> {
     emit(GetUserDataLoadingState());
     FirebaseFirestore.instance.collection('users').doc(uId).get().then((value) {
       user = UserModel.fromJson(value.data()!);
+      FirebaseMessaging.instance.getToken().then((value) {
+        user = UserModel(
+            phone: user!.phone,
+          name: user!.name,
+          email: user!.email,
+          image: user!.image,
+          cover: user!.cover,
+          uId: user!.uId,
+          bio: user!.bio,
+          fcmToken: value
+        );
+        FirebaseFirestore.instance.collection('users')
+            .doc(user!.uId).update(user!.ToMap());
+      });
       print(user!.uId);
       emit(GetUserDataSuccessfullyState());
     }).catchError((error) {
@@ -90,12 +103,19 @@ class SocialCubit extends Cubit<SocialStates> {
     emit(UploadProfileImageLoadingState());
     FirebaseStorage.instance
         .ref()
-        .child('images/${Uri.file(profileImage!.path).pathSegments.last}')
+        .child('images/${Uri
+        .file(profileImage!.path)
+        .pathSegments
+        .last}')
         .putFile(profileImage!)
         .then((value) {
       value.ref.getDownloadURL().then((value) {
         UpdateUserData(
-            name: name, email: email, bio: bio, phone: phone, image: value);
+            name: name,
+            email: email,
+            bio: bio,
+            phone: phone,
+            image: value);
         emit(UploadProfileImageSuccessfullyState());
       }).catchError((error) {
         emit(UploadProfileImageErrorState());
@@ -114,7 +134,10 @@ class SocialCubit extends Cubit<SocialStates> {
     emit(UploadCoverImageLoadingState());
     FirebaseStorage.instance
         .ref()
-        .child('image/${Uri.file(coverImage!.path).pathSegments.last}')
+        .child('image/${Uri
+        .file(coverImage!.path)
+        .pathSegments
+        .last}')
         .putFile(coverImage!)
         .then((value) {
       value.ref.getDownloadURL().then((value) {
@@ -151,6 +174,7 @@ class SocialCubit extends Cubit<SocialStates> {
       email: email,
       cover: cover ?? user!.cover,
       bio: bio,
+      fcmToken: user!.fcmToken,
     );
     FirebaseFirestore.instance
         .collection('users')
@@ -235,20 +259,24 @@ class SocialCubit extends Cubit<SocialStates> {
     emit(UploadPostImageLoadingState());
     FirebaseStorage.instance
         .ref()
-        .child('image/${Uri.file(postImage!.path).pathSegments.last}')
+        .child('image/${Uri
+        .file(postImage!.path)
+        .pathSegments
+        .last}')
         .putFile(postImage!)
-        .then((value) => {
-              value.ref.getDownloadURL().then((value) {
-                emit(UploadPostImageSuccessfullyState());
-                CreateNewPost(
-                  date: date,
-                  text: text,
-                  postImage: value,
-                );
-              }).catchError((error) {
-                emit(UploadPostImageErrorState());
-              })
-            })
+        .then((value) =>
+    {
+      value.ref.getDownloadURL().then((value) {
+        emit(UploadPostImageSuccessfullyState());
+        CreateNewPost(
+          date: date,
+          text: text,
+          postImage: value,
+        );
+      }).catchError((error) {
+        emit(UploadPostImageErrorState());
+      })
+    })
         .catchError((error) {
       emit(UploadPostImageErrorState());
     });
@@ -258,12 +286,12 @@ class SocialCubit extends Cubit<SocialStates> {
   List<PostModel> posts = [];
 
   GetAllPosts() {
-    posts = [];
+    // posts = [];
     // likes = [] ;
     emit(GetAllPostsLoadingState());
     FirebaseFirestore.instance.collection('posts').orderBy('date').snapshots()
 
-        // .get()
+    // .get()
         .listen((value) {
       posts = [];
 
@@ -323,7 +351,7 @@ class SocialCubit extends Cubit<SocialStates> {
     users = [];
     emit(GetAllUsersLoadingState());
     FirebaseFirestore.instance.collection('users')
-    .snapshots().listen((value) {
+        .snapshots().listen((value) {
       users = [];
       value.docs.forEach((element) {
         GetUserData();
@@ -430,14 +458,13 @@ class SocialCubit extends Cubit<SocialStates> {
     });
   }
 
-  AddComment(
-      {required String postId,
-      required String text,
-      required String userImage,
-      required String name,
-      required String date,
-      String? commentImage,
-      required String time}) {
+  AddComment({required String postId,
+    required String text,
+    required String userImage,
+    required String name,
+    required String date,
+    String? commentImage,
+    required String time}) {
     emit(AddCommentLoadingState());
     CommentsDataModel comment = CommentsDataModel(
       text: text,
@@ -490,24 +517,28 @@ class SocialCubit extends Cubit<SocialStates> {
     emit(UploadCommentImageLoadingState());
     FirebaseStorage.instance
         .ref()
-        .child('comments/${Uri.file(commentImage!.path).pathSegments.last}')
+        .child('comments/${Uri
+        .file(commentImage!.path)
+        .pathSegments
+        .last}')
         .putFile(commentImage!)
-        .then((value) => {
-              value.ref.getDownloadURL().then((value) {
-                emit(UploadCommentImageSuccessfullyState());
-                AddComment(
-                  date: date,
-                  text: text,
-                  commentImage: value,
-                  name: name,
-                  postId: postId,
-                  userImage: userImage,
-                  time: time,
-                );
-              }).catchError((error) {
-                emit(UploadCommentImageErrorState());
-              })
-            })
+        .then((value) =>
+    {
+      value.ref.getDownloadURL().then((value) {
+        emit(UploadCommentImageSuccessfullyState());
+        AddComment(
+          date: date,
+          text: text,
+          commentImage: value,
+          name: name,
+          postId: postId,
+          userImage: userImage,
+          time: time,
+        );
+      }).catchError((error) {
+        emit(UploadCommentImageErrorState());
+      })
+    })
         .catchError((error) {
       emit(UploadCommentImageErrorState());
     });
@@ -526,7 +557,7 @@ class SocialCubit extends Cubit<SocialStates> {
         .orderBy("time")
         .snapshots()
 
-        // .get()
+    // .get()
 
         .listen((value) {
       comments = [];
@@ -592,36 +623,41 @@ class SocialCubit extends Cubit<SocialStates> {
     emit(UploadPostVideoLoadingState());
     FirebaseStorage.instance
         .ref()
-        .child('videos/${Uri.file(postVideo!.path).pathSegments.last}')
+        .child('videos/${Uri
+        .file(postVideo!.path)
+        .pathSegments
+        .last}')
         .putFile(postVideo!)
-        .then((value) => {
-              value.ref.getDownloadURL().then((value) async {
-                // controller = VideoPlayerController.network(
-                //   value,
-                // );
-                //   await controller!.initialize().then((_) {
-                //     // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-                //
-                //   });
-                // emit(UploadPostVideoSuccessfullyState());
-                CreateNewPost(
-                  date: date,
-                  text: text,
-                  postVideo: value,
-                );
-                emit(UploadPostVideoSuccessfullyState());
-              }).catchError((error) {
-                emit(UploadPostVideoErrorState());
-              })
-            })
+        .then((value) =>
+    {
+      value.ref.getDownloadURL().then((value) async {
+        // controller = VideoPlayerController.network(
+        //   value,
+        // );
+        //   await controller!.initialize().then((_) {
+        //     // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+        //
+        //   });
+        // emit(UploadPostVideoSuccessfullyState());
+        CreateNewPost(
+          date: date,
+          text: text,
+          postVideo: value,
+        );
+        emit(UploadPostVideoSuccessfullyState());
+      }).catchError((error) {
+        emit(UploadPostVideoErrorState());
+      })
+    })
         .catchError((error) {
       emit(UploadPostVideoErrorState());
     });
   }
 
-  List<UserModel> searchResult=[];
-  Search(name){
-    searchResult =  users.where((element){
+  List<UserModel> searchResult = [];
+
+  Search(name) {
+    searchResult = users.where((element) {
       return element.name.contains(name);
     }
 
@@ -640,13 +676,40 @@ class SocialCubit extends Cubit<SocialStates> {
     emit(SearchSuccessfully());
   }
 
-  // List<PostModel> userPosts =[];
-  // GetUserPosts(context){
-  //   emit(GetUserPostsLoadingState());
-  //    userPosts =
-  //   SocialCubit.get(context).posts.where((element) {
-  //     return element.userId == user!.uId;
-  //   }).toList();
-  //    emit(GetUserPostsSuccessfullyState());
-  // }
+
+  Notification({
+    required String to,
+    required String body,
+    required String title,
+
+
+  }){
+    DioHelper.PostData(
+      url: 'send',
+      data: {
+        'to' : to,
+        "notification": {
+          "body": body,
+          "title": title,
+          "subtitle": "new message",
+        }
+      },
+    ).then((value){
+      print(value.data['success']);
+      emit(NotificationSuccessfullytstate());
+    }).catchError((error){
+      emit(NotificationErrortstate());
+      print(error);
+    });
+  }
+
+// List<PostModel> userPosts =[];
+// GetUserPosts(context){
+//   emit(GetUserPostsLoadingState());
+//    userPosts =
+//   SocialCubit.get(context).posts.where((element) {
+//     return element.userId == user!.uId;
+//   }).toList();
+//    emit(GetUserPostsSuccessfullyState());
+// }
 }

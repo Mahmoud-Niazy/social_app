@@ -1,22 +1,30 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_final/dio_helper/dio.dart';
 import 'package:social_final/screens/another_user_screen.dart';
 import 'package:social_final/screens/comments_screen.dart';
 import 'package:social_final/screens/edit_profile_screen.dart';
-import 'package:social_final/screens/login_screen.dart';
 import 'package:social_final/screens/register_screen.dart';
 import 'package:social_final/social_cubit/social_cubit.dart';
 import 'package:social_final/social_layout/social_layout.dart';
-
+import 'package:social_final/splash_screen/splash_screen.dart';
 import 'cashe_helper/cashe_helper.dart';
-
 import 'constants.dart';
 
 void main()async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await DioHelper.Init();
+  FirebaseMessaging.onMessage.listen((event) {
+    print('noti');
+  });
+  FirebaseMessaging.onMessageOpenedApp.listen((event) {
+    print('noti 2');
+
+  });
  await  CasheHelper.Init();
   uId  = CasheHelper.GetData(key: 'uId');
   AwesomeNotifications().initialize(
@@ -34,6 +42,7 @@ void main()async{
     ],
   );
   runApp(MyApp());
+
 }
 
 class MyApp extends StatelessWidget{
@@ -75,9 +84,10 @@ class MyApp extends StatelessWidget{
             backgroundColor: Colors.white,
           ),
         ),
-        initialRoute: uId == null?  '/' : SocialLayout.route,
+        initialRoute: '/',
+        // uId == null?  '/' : SocialLayout.route,
         routes: {
-          '/' : (context) => LoginScreen(),
+          '/' : (context) => SplashScreen(),
           RegisterScreen.route : (context) => RegisterScreen(),
           SocialLayout.route : (context) => SocialLayout(),
           EditProfileScreen.route : (context)=> EditProfileScreen(),

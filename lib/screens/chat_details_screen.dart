@@ -1,8 +1,6 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../data_models/message_data_model.dart';
 import '../data_models/user_data_model.dart';
 import '../social_cubit/social_cubit.dart';
@@ -11,6 +9,7 @@ import '../social_cubit/social_states.dart';
 class ChatDetailsScreen extends StatelessWidget {
   var textController = TextEditingController();
   late UserModel user;
+
   ChatDetailsScreen(this.user);
 
   @override
@@ -19,7 +18,9 @@ class ChatDetailsScreen extends StatelessWidget {
       builder: (context) {
         SocialCubit.get(context).GetAllMessages(id: user.uId);
         return BlocConsumer<SocialCubit, SocialStates>(
-          listener: (context, state) {},
+          listener: (context, state) {
+            print(state);
+          },
           builder: (context, state) {
             return Scaffold(
               appBar: AppBar(
@@ -73,11 +74,10 @@ class ChatDetailsScreen extends StatelessWidget {
                         itemCount: SocialCubit.get(context).messages.length,
                       ),
                     ),
-                    fallback: (context) =>
-                        Center(child: CircularProgressIndicator()),
+                    fallback: (context) =>Text(''),
+                        // Center(child: CircularProgressIndicator()),
                   ),
-                 if(SocialCubit.get(context).messages.length==0)
-                   Spacer(),
+                  if (SocialCubit.get(context).messages.length == 0) Spacer(),
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 15.0,
@@ -101,17 +101,32 @@ class ChatDetailsScreen extends StatelessWidget {
                               text: textController.text,
                               date: DateTime.now().toString(),
                             );
-                            if(SocialCubit.get(context).user!.uId==user.uId ){
-                              AwesomeNotifications().createNotification(
-                                  content: NotificationContent(
-                                  id: 1,
-                                  channelKey: 'basic_channel',
-                                  title: SocialCubit.get(context).user!.name,
-                                  body: textController.text,
-                                  ),
 
-                              );
-                            }
+                            SocialCubit.get(context).Notification(
+                              to: user.fcmToken!,
+                              body: textController.text,
+                              title: 'New message from :' +SocialCubit.get(context).user!.name,
+                            );
+
+                            // FirebaseMessaging.instance.sendMessage(
+                            //   to: user.fcmToken,
+                            //   data: {
+                            //     'message' : '${textController.text}'
+                            //   },
+                            //
+                            // );
+///////////////////////////////////////////////////////////////////
+                            // if(SocialCubit.get(context).user!.uId==user.uId ){
+                            //   AwesomeNotifications().createNotification(
+                            //       content: NotificationContent(
+                            //       id: 1,
+                            //       channelKey: 'basic_channel',
+                            //       title: SocialCubit.get(context).user!.name,
+                            //       body: textController.text,
+                            //       ),
+                            //
+                            //   );
+                            // }
                             textController.text = '';
                           },
                           icon: Icon(

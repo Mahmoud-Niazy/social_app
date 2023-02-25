@@ -9,7 +9,6 @@ class RegisterCubit extends Cubit<RegisterStates> {
   RegisterCubit() : super(RegisterInitialState());
 
   static RegisterCubit get(context) => BlocProvider.of(context);
-
   bool isPassword = true;
 
   ToggleSuffixIcon() {
@@ -22,7 +21,10 @@ class RegisterCubit extends Cubit<RegisterStates> {
     required String password,
     required String name ,
     required String phone,
+     String? fcmToken,
+
   }) {
+
     emit(UserRegisterLoadingState());
     FirebaseAuth.instance
         .createUserWithEmailAndPassword(
@@ -35,6 +37,7 @@ class RegisterCubit extends Cubit<RegisterStates> {
         name: name,
         email: email,
         phone: phone,
+        fcmToken: fcmToken
       );
       emit(UserRegisterSuccessfullyState());
     }).catchError((error) {
@@ -47,12 +50,14 @@ class RegisterCubit extends Cubit<RegisterStates> {
     required String name,
     required String email,
     required String phone,
-  }) {
+     String? fcmToken,
+  })async {
     emit(UserCreateLoadingState());
     UserModel user = UserModel(
       phone: phone,
       name: name,
       email: email,
+      fcmToken: fcmToken,
       image:
           'https://img.freepik.com/premium-photo/tiny-cute-adorable-animal_727939-188.jpg?size=338&ext=jpg&ga=GA1.2.190088039.1657057581',
       cover:

@@ -1,3 +1,5 @@
+import 'package:social_final/data_models/user_data_model.dart';
+
 class PostModel {
   String? name ;
   String? image ;
@@ -10,6 +12,7 @@ class PostModel {
   int numOfComments=0 ;
    String? userId ;
    String? postVideo ;
+   UserModel? user ;
 
   PostModel({
     this.text,
@@ -23,6 +26,7 @@ class PostModel {
     this.numOfComments=0,
      this.userId,
     this.postVideo,
+    this.user,
   });
 
   PostModel.fromJson(Map<String,dynamic>json){
@@ -37,6 +41,8 @@ class PostModel {
     numOfComments = json['numOfComments'];
     userId = json['userId'];
     postVideo = json['postVideo'];
+    user = json['user'];
+
 
 
 
@@ -55,6 +61,7 @@ class PostModel {
       'numOfComments' : numOfComments,
       'userId' : userId,
       'postVideo' : postVideo,
+      'user' : user,
 
     };
   }

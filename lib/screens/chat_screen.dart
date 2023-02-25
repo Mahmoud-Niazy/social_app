@@ -25,7 +25,8 @@ class ChatsScreen extends StatelessWidget {
             ),
             itemCount: SocialCubit.get(context).users.length,
           ),
-          fallback: (context) => Center(child: CircularProgressIndicator()),
+          fallback: (context) => Center(child: Text('no users yet')),
+              // Center(child: CircularProgressIndicator()),
         );
       },
     );

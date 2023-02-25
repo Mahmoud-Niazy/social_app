@@ -17,9 +17,9 @@ class AddPostScreen extends StatelessWidget {
       listener: (context, state) {
         if (state is CreateNewPostSuccessfullyState) {
           // SocialCubit.get(context).GetAllPosts();
+          SocialCubit.get(context).BottomNavigation(0);
           SocialCubit.get(context).RemovePostImage();
           textController.text = '';
-          SocialCubit.get(context).currentIndex = 0;
         }
         print(state);
       },

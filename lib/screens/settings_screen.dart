@@ -1,12 +1,12 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_final/data_models/new_post_data_model.dart';
 import '../cashe_helper/cashe_helper.dart';
 import '../reusable_components/reusable_components.dart';
 import '../social_cubit/social_cubit.dart';
 import '../social_cubit/social_states.dart';
 import 'edit_profile_screen.dart';
+import 'login_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   @override
@@ -15,12 +15,12 @@ class SettingsScreen extends StatelessWidget {
       listener: (context, state) {},
       builder: (context, state) {
         var user = SocialCubit.get(context).user;
-        List<PostModel> userPosts =
-            SocialCubit.get(context).posts.where((element) {
-          return element.userId == SocialCubit.get(context).user!.uId;
-        }).toList();
+        // List<PostModel> userPosts =
+        //     SocialCubit.get(context).posts.where((element) {
+        //   return element.userId == SocialCubit.get(context).user!.uId;
+        // }).toList();
         return ConditionalBuilder(
-          condition: user != null ,
+          condition: user != null,
           builder: (context) => Padding(
             padding: const EdgeInsets.all(20.0),
             child: SingleChildScrollView(
@@ -74,40 +74,40 @@ class SettingsScreen extends StatelessWidget {
                   SizedBox(
                     height: 30,
                   ),
-                  Row(
-                    children: [
-                      // Expanded(
-                      //     child: Column(
-                      //   children: [
-                      //     Text(
-                      //       'Followers',
-                      //       style: Theme.of(context).textTheme.caption,
-                      //     ),
-                      //     Text(
-                      //       '10',
-                      //       style: TextStyle(
-                      //         fontSize: 20,
-                      //       ),
-                      //     ),
-                      //   ],
-                      // )),
-                      Expanded(
-                          child: Column(
-                        children: [
-                          Text(
-                            'Posts',
-                            style: Theme.of(context).textTheme.caption,
-                          ),
-                          Text(
-                            '${userPosts.length}',
-                            style: TextStyle(
-                              fontSize: 20,
-                            ),
-                          ),
-                        ],
-                      )),
-                    ],
-                  ),
+                  // Row(
+                  //   children: [
+                  //     // Expanded(
+                  //     //     child: Column(
+                  //     //   children: [
+                  //     //     Text(
+                  //     //       'Followers',
+                  //     //       style: Theme.of(context).textTheme.caption,
+                  //     //     ),
+                  //     //     Text(
+                  //     //       '10',
+                  //     //       style: TextStyle(
+                  //     //         fontSize: 20,
+                  //     //       ),
+                  //     //     ),
+                  //     //   ],
+                  //     // )),
+                  //     Expanded(
+                  //         child: Column(
+                  //       children: [
+                  //         Text(
+                  //           'Posts',
+                  //           style: Theme.of(context).textTheme.caption,
+                  //         ),
+                  //         Text(
+                  //           '${userPosts.length}',
+                  //           style: TextStyle(
+                  //             fontSize: 20,
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     )),
+                  //   ],
+                  // ),
                   SizedBox(
                     height: 40.0,
                   ),
@@ -133,10 +133,17 @@ class SettingsScreen extends StatelessWidget {
                       SocialCubit.get(context).coverImage = null;
                       SocialCubit.get(context).postImage = null;
                       CasheHelper.RemoveData(key: 'uId').then((value) {
-                        NavigateAndRemove(
-                          context: context,
-                          route: '/',
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LoginScreen(),
+                          ),
+                          (route) => false,
                         );
+                        // NavigateAndRemove(
+                        //   context: context,
+                        //   route: '/',
+                        // );
                       });
                     },
                     label: 'Logout',

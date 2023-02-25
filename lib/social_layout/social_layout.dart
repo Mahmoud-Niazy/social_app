@@ -1,5 +1,7 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:social_final/screens/search_screen.dart';
 import 'package:social_final/social_cubit/social_cubit.dart';
 
@@ -28,7 +30,7 @@ class SocialLayout extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context)=> SearchScreen()),
+                    MaterialPageRoute(builder: (context) => SearchScreen()),
                   );
                 },
                 icon: Icon(
@@ -37,33 +39,66 @@ class SocialLayout extends StatelessWidget {
               ),
             ],
           ),
-          bottomNavigationBar: BottomNavigationBar(
+          bottomNavigationBar: SalomonBottomBar(
+            currentIndex:cubit.currentIndex,
+            onTap: (i) => cubit.BottomNavigation(i),
+
             items: [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                label: 'Home',
+              SalomonBottomBarItem(
+                icon: Icon(Icons.home),
+                title: Text("Home"),
+                // selectedColor: Colors.purple,
               ),
-              BottomNavigationBarItem(
+
+              SalomonBottomBarItem(
                 icon: Icon(Icons.chat_outlined),
-                label: 'Chats',
+                title: Text("Chats"),
+                // selectedColor: Colors.pink,
               ),
-              BottomNavigationBarItem(
+
+              SalomonBottomBarItem(
                 icon: Icon(Icons.upload_file),
-                label: 'Post',
+                title: Text("Post"),
+                // selectedColor: Colors.orange,
               ),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.settings_outlined), label: 'Settings'),
+
+              SalomonBottomBarItem(
+                icon: Icon(Icons.settings_outlined),
+                title: Text("Settings"),
+                // selectedColor: Colors.teal,
+              ),
             ],
-            currentIndex: cubit.currentIndex,
-            onTap: (index) {
-              if (index == 1) {
-                SocialCubit.get(context).GetAllUsers();
-              }
-              cubit.BottomNavigation(index);
-            },
           ),
           body: cubit.screens[cubit.currentIndex],
         );
+
+          // BottomNavigationBar(
+          //   items: [
+          //     BottomNavigationBarItem(
+          //       icon: Icon(Icons.home_outlined),
+          //       label: 'Home',
+          //     ),
+          //     BottomNavigationBarItem(
+          //       icon: Icon(Icons.chat_outlined),
+          //       label: 'Chats',
+          //     ),
+          //     BottomNavigationBarItem(
+          //       icon: Icon(Icons.upload_file),
+          //       label: 'Post',
+          //     ),
+          //     BottomNavigationBarItem(
+          //         icon: Icon(Icons.settings_outlined), label: 'Settings'),
+          //   ],
+          //   currentIndex: cubit.currentIndex,
+          //   onTap: (index) {
+          //     if (index == 1) {
+          //       SocialCubit.get(context).GetAllUsers();
+          //     }
+          //     cubit.BottomNavigation(index);
+          //   },
+          // ),
+
+
       },
     );
   }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_final/screens/comments_screen.dart';
@@ -13,85 +14,89 @@ import '../social_cubit/social_states.dart';
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Builder(builder: (context){
-      SocialCubit.get(context).GetAllPosts();
-      return BlocConsumer<SocialCubit, SocialStates>(
-        listener: (context, state) {
-          if (state is GetUserDataSuccessfullyState) {
-            // SocialCubit.get(context).GetAllUsers() ;
+    return Builder(
+      builder: (context) {
+        SocialCubit.get(context).GetAllPosts();
+        return BlocConsumer<SocialCubit, SocialStates>(
+          listener: (context, state) {
+            if (state is GetUserDataSuccessfullyState) {
+              // SocialCubit.get(context).GetAllUsers() ;
 
-          }
-        },
-        builder: (context, state) {
-          return ConditionalBuilder(
-            condition: SocialCubit.get(context).posts.length > 0,
-            builder: (context) {
-              return SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                child: Column(
-                  children: [
-                    Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        Card(
-                          child: Image(
-                            image: NetworkImage(
-                              'https://img.freepik.com/free-photo/excited-happy-young-pretty-woman_171337-2005.jpg?size=626&ext=jpg&ga=GA1.2.190088039.1657057581',
+            }
+          },
+          builder: (context, state) {
+            return ConditionalBuilder(
+              condition: SocialCubit.get(context).posts.length > 0 &&
+                  SocialCubit.get(context).user != null,
+              builder: (context) {
+                return SingleChildScrollView(
+                  physics: BouncingScrollPhysics(),
+                  child: Column(
+                    children: [
+                      Stack(
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          Card(
+                            child: Image(
+                              image: NetworkImage(
+                                'https://img.freepik.com/free-photo/excited-happy-young-pretty-woman_171337-2005.jpg?size=626&ext=jpg&ga=GA1.2.190088039.1657057581',
+                              ),
+                            ),
+                            elevation: 15,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Text(
+                              'Communicate with your friends',
+                              style: TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
-                          elevation: 15,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Text(
-                            'Communicate with your friends',
-                            style: TextStyle(
-                              fontSize: 15.0,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    ListView.separated(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) => BuildPostItem(
-                          context, SocialCubit.get(context).posts[index], index),
-                      separatorBuilder: (context, index) => SizedBox(
-                        height: 15.0,
+                        ],
                       ),
-                      itemCount: SocialCubit.get(context).posts.length,
-                    ),
-                  ],
-                ),
-              );
-            },
-            fallback: (context) => Center(child: CircularProgressIndicator()),
-            //     Center(
-            //     child: Column(
-            //   children: [
-            //     Icon(
-            //       Icons.hourglass_empty,
-            //       size: 150,
-            //     ),
-            //     Text(
-            //       'No posts',
-            //       style: TextStyle(
-            //         fontSize: 50,
-            //         fontWeight: FontWeight.bold,
-            //       ),
-            //     ),
-            //   ],
-            // )),
-          );
-        },
-      );
-    },);
-
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      ListView.separated(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) => BuildPostItem(context,
+                            SocialCubit.get(context).posts[index], index),
+                        separatorBuilder: (context, index) => SizedBox(
+                          height: 15.0,
+                        ),
+                        itemCount: SocialCubit.get(context).posts.length,
+                      ),
+                    ],
+                  ),
+                );
+              },
+              fallback: (context) => Center(child: Text('No posts yet ')),
+              // Center(child: CircularProgressIndicator()),
+              ///////////////////////////
+              //     Center(
+              //     child: Column(
+              //   children: [
+              //     Icon(
+              //       Icons.hourglass_empty,
+              //       size: 150,
+              //     ),
+              //     Text(
+              //       'No posts',
+              //       style: TextStyle(
+              //         fontSize: 50,
+              //         fontWeight: FontWeight.bold,
+              //       ),
+              //     ),
+              //   ],
+              // )),
+            );
+          },
+        );
+      },
+    );
   }
 
   Widget BuildPostItem(context, PostModel post, index) {
@@ -121,6 +126,9 @@ class HomeScreen extends StatelessWidget {
 
                     InkWell(
                       onTap: () {
+                        FirebaseMessaging.instance.getToken().then((value) {
+                          print(value);
+                        });
                         // NavigateWithName(
                         //     context: context,
                         //     route: AnotherUserScreen.route,
@@ -418,19 +426,38 @@ class HomeScreen extends StatelessWidget {
                             likes: (post.likes!) + 1,
                             numOfComments: post.numOfComments,
                             userWhoLike: post.userWhoLike,
-                            userId: SocialCubit.get(context).user!.uId,
+                            userId: post.userId,
                           );
                           FirebaseFirestore.instance
                               .collection('posts')
                               .doc(post.postId)
                               .update(newPost.ToMap())
                               .then((value) {
+                           FirebaseFirestore.instance.collection('users')
+                            .doc(post.userId).get().then((value){
+                             SocialCubit.get(context).Notification(
+                               to: value.data()!['fcmToken'],
+                               body: '${SocialCubit.get(context).user!.name} liked your post',
+                               title: ' new like on your post',
+                             );
+                           });
+
                             print('Like successfully');
-                            SocialCubit.get(context).GetAllPosts();
+                            // SocialCubit.get(context).GetAllPosts();
                           }).catchError((error) {
                             print(error);
                           });
-                        } else {
+                          // UserModel user = SocialCubit.get(context)
+                          //     .users
+                          //     .firstWhere(
+                          //         (element) => element.uId == post.userId);
+                          // SocialCubit.get(context).Notification(
+                          //   to: user.fcmToken!,
+                          //   body: '${SocialCubit.get(context).user!.name} liked your post',
+                          //   title: ' new like on your post',
+                          // );
+                        }
+                        else {
                           post.userWhoLike
                               .remove(SocialCubit.get(context).user!.uId);
                           PostModel newPost = PostModel(
@@ -443,7 +470,7 @@ class HomeScreen extends StatelessWidget {
                             likes: (post.likes!) - 1,
                             userWhoLike: post.userWhoLike,
                             numOfComments: post.numOfComments,
-                            userId: SocialCubit.get(context).user!.uId,
+                            userId: post.userId,
                           );
                           FirebaseFirestore.instance
                               .collection('posts')
@@ -475,6 +502,8 @@ class HomeScreen extends StatelessWidget {
                         //   print(error);
                         // });
                         // SocialCubit.get(context).Like(postId: post.postId!);
+
+
                       },
                     ),
                   ],

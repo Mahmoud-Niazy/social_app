@@ -105,6 +105,11 @@ class GetUserPostsLoadingState extends SocialStates{}
 class GetUserPostsSuccessfullyState extends SocialStates{}
 
 
+class NotificationSuccessfullytstate extends SocialStates{}
+class NotificationErrortstate extends SocialStates{}
+
+
+
 
 
 
