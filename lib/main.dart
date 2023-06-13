@@ -16,9 +16,30 @@ import 'constants.dart';
 
 void main()async{
   WidgetsFlutterBinding.ensureInitialized();
+  AwesomeNotifications().initialize(
+    // 'resource://mipmap-xxxhdpi/ic_launcher.png',
+    null,
+    [
+      NotificationChannel(
+        channelKey: 'Firebase',
+        channelName: 'Firebase',
+        channelDescription: 'Fcm from Firebase',
+        playSound: true,
+        channelShowBadge: true,
+      ),
+    ],
+  );
   await Firebase.initializeApp();
   await DioHelper.Init();
   FirebaseMessaging.onMessage.listen((event) {
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: 5,
+        channelKey: 'Firebase',
+        title: event.notification!.title,
+        body: event.notification!.body,
+      ),
+    );
     print('noti');
   });
   FirebaseMessaging.onMessageOpenedApp.listen((event) {
@@ -51,7 +72,7 @@ class MyApp extends StatelessWidget{
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => SocialCubit()..GetUserData()..GetAllPosts()..GetAllUsers(),
+          create: (context) => SocialCubit()..GetUserData()..GetAllPosts(),
         ),
       ],
       child: MaterialApp(

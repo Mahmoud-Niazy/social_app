@@ -125,7 +125,7 @@ class SettingsScreen extends StatelessWidget {
                   BuildMaterialButton(
                     onPressed: () {
                       SocialCubit.get(context).user = null;
-                      SocialCubit.get(context).users = [];
+                      // SocialCubit.get(context).users = [];
                       SocialCubit.get(context).messages = [];
                       // SocialCubit.get(context).likes= [] ;
                       SocialCubit.get(context).posts = [];

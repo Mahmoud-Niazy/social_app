@@ -26,6 +26,9 @@ class SocialCubit extends Cubit<SocialStates> {
   int currentIndex = 0;
 
   BottomNavigation(index) {
+    if(index ==1 ){
+      GetAllUsers();
+    }
     currentIndex = index;
     emit(BottomNavigationState());
   }
